@@ -14,7 +14,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from dotenv import load_dotenv  # ✅ FIX 1 : chargement sécurisé de la clé API
+from dotenv import load_dotenv
 
 # ==================== CONFIGURATION FLASK ====================
 app = Flask(__name__)
@@ -25,7 +25,7 @@ CORS(app)
 load_dotenv()
 groq_api_key = os.getenv("GROQ_API_KEY")
 if not groq_api_key:
-    raise EnvironmentError("❌ GROQ_API_KEY manquante. Ajoutez-la dans votre fichier .env")
+    raise EnvironmentError(" GROQ_API_KEY manquante. Ajoutez-la dans votre fichier .env")
 
 llm = ChatGroq(
     model="llama-3.1-8b-instant",
@@ -172,21 +172,43 @@ def scribe_node(state: AgentState) -> dict:
     )
     return {"final_report": res.content}
 
-# ==================== DÉCISION CONDITIONNELLE ====================
 def should_continue(state: AgentState) -> str:
-    """
-    ✅ FIX 4 : iterations est incrémenté dans analyzer_node à chaque passage,
-               donc la condition <= 1 permet un seul cycle d'optimisation max.
-    """
-    if state["risk_score"] >= 3 and state.get("iterations", 0) <= 1:
-        print(f"→ Score {state['risk_score']}/10 : optimisation requise (itération {state['iterations']})")
-        return "optimize"
-    print(f"→ Score {state['risk_score']}/10 : rédaction du rapport final")
-    return "scribe"
+    score = state["risk_score"]
+    iterations = state.get("iterations", 0)
 
-# ==================== GRAPHE LANGGRAPH ====================
+    if score >= 3 and iterations <= 1:
+        print(f"→ Score {score}/10 : optimisation requise (itération {iterations})")
+        return "optimize"
+    elif score < 3 and iterations <= 1:
+        # ✅ Conforme dès le 1er passage → rapport simple, pas de LLM
+        print(f"→ Score {score}/10 : conforme dès le départ → rapport direct")
+        return "scribe_direct"
+    else:
+        # Après optimisation → rapport complet via LLM
+        print(f"→ Score {score}/10 : rédaction du rapport final post-optimisation")
+        return "scribe"
+
+def scribe_direct_node(state: AgentState) -> dict:
+    """Agent 6b : Rapport automatique sans LLM si protocole déjà conforme."""
+    print("─── AGENT 6b : RAPPORT DIRECT (conforme) ───")
+    score = state["risk_score"]
+    justification = state["risk_justification"]
+
+    report = (
+        "RÉSUMÉ EXÉCUTIF\n"
+        f"Le protocole analysé est conforme aux normes ISO applicables. "
+        f"Score de risque : {score}/10.\n\n"
+        "ÉCARTS ISO\n"
+        "Aucun écart détecté. Toutes les exigences sont respectées.\n\n"
+        "PROTOCOLE CORRIGÉ\n"
+        "Aucune correction nécessaire. Le protocole original est validé tel quel.\n\n"
+        "RECOMMANDATIONS\n"
+        f"- Maintenir les pratiques actuelles.\n"
+        f"- Justification du score : {justification}\n"
+        "- Conserver les enregistrements de conformité pour audit futur."
+    )
+    return {"final_report": report}
 def create_graph():
-    """Crée et compile le graphe Langgraph."""
     workflow = StateGraph(AgentState)
 
     for name, fn in [
@@ -195,7 +217,8 @@ def create_graph():
         ("validate", validator_node),
         ("assess", risk_assessor_node),
         ("optimize", optimizer_node),
-        ("scribe", scribe_node)
+        ("scribe", scribe_node),
+        ("scribe_direct", scribe_direct_node),
     ]:
         workflow.add_node(name, fn)
 
@@ -206,10 +229,15 @@ def create_graph():
     workflow.add_conditional_edges(
         "assess",
         should_continue,
-        {"optimize": "optimize", "scribe": "scribe"}
+        {
+            "optimize": "optimize",
+            "scribe": "scribe",
+            "scribe_direct": "scribe_direct",
+        }
     )
     workflow.add_edge("optimize", "analyze")
     workflow.add_edge("scribe", END)
+    workflow.add_edge("scribe_direct", END)
 
     return workflow.compile()
 
