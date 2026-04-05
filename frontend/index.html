@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Industrial Protocol Validator">
+    <title>AI Protocol Validator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <h1>AI Protocol Validator</h1>
+        </div>
+        <p>Validez vos protocoles industriels avec l'intelligence artificielle.</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Config Section -->
+        <section class="card config-section">
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="dropZone">
+                <input type="file" id="fileInput" accept="application/pdf" hidden>
+                <div class="upload-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                </div>
+                <h3>Glissez un fichier PDF ici</h3>
+                <p>ou</p>
+                <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()">Parcourir les fichiers</button>
+                <p id="fileNameDisplay" class="file-name"></p>
+            </div>
+
+            <!-- Settings -->
+            <div class="settings-area">
+                <div class="input-group">
+                    <label for="normInput">Norme Industrielle</label>
+                    <input type="text" id="normInput" placeholder="Ex: ISO 22716">
+                </div>
+                <button id="analyzeBtn" class="btn btn-primary" disabled>
+                    <span>Analyser le protocole</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Loading Pipeline -->
+        <section id="loadingSection" class="card loading-section hidden">
+            <div class="pipeline-progress">
+                <div class="progress-info">
+                    <span id="pipelineStep">Agent 1: Extraction du texte...</span>
+                    <span id="pipelinePercentage">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+            <div class="loader-stages">
+                <div class="stage pending" id="stage1">1. Extraction PDF</div>
+                <div class="stage pending" id="stage2">2. Analyse Sémantique</div>
+                <div class="stage pending" id="stage3">3. Vérification des Normes</div>
+                <div class="stage pending" id="stage4">4. Évaluation du Risque</div>
+                <div class="stage pending" id="stage5">5. Génération du Rapport</div>
+            </div>
+        </section>
+
+        <!-- Results Dashboard -->
+        <section id="resultsSection" class="results-dashboard hidden">
+            <div class="summary-cards">
+                <div class="card risk-card" id="riskCard">
+                    <h3>Score de Risque</h3>
+                    <div class="risk-score" id="riskScoreValue">--</div>
+                    <div class="decision-badge" id="decisionBadge">----</div>
+                </div>
+
+                <div class="card action-card">
+                    <h3>Rapport Final</h3>
+                    <p>Le rapport complet a été généré et est prêt à être téléchargé.</p>
+                    <button id="downloadPdfBtn" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        Télécharger le rapport PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="details-grid">
+                <div class="card detail-card">
+                    <h4>Analyse du Protocole</h4>
+                    <div class="data-group">
+                        <h5>Étapes</h5>
+                        <ul id="analysisSteps"></ul>
+                    </div>
+                    <div class="data-group">
+                        <h5>Ingrédients</h5>
+                        <div class="chip-container" id="analysisIngredients"></div>
+                    </div>
+                </div>
+
+                <div class="card detail-card">
+                    <h4>Validation</h4>
+                    <div class="data-group">
+                        <h5>Normes appliquées</h5>
+                        <ul id="analysisNorms"></ul>
+                    </div>
+                    <div class="data-group">
+                        <h5>Erreurs détectées</h5>
+                        <ul id="analysisErrors" class="error-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

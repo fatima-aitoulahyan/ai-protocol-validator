@@ -1,0 +1,12 @@
+# Python
+backend/venv/
+backend/.env
+__pycache__/
+*.pyc
+
+# IDEs (WebStorm, IntelliJ, VS Code)
+.idea/
+.vscode/
+
+# Node / Frontend
+frontend/node_modules/
