@@ -1,124 +1,126 @@
-# 🧪 AI Protocol Validator
+# AI Protocol Validator
 
-> Plateforme intelligente de validation de protocoles industriels et cosmétiques basée sur l'intelligence artificielle multi-agents (LangGraph + Groq).
+Plateforme intelligente de validation de protocoles industriels et cosmetiques basee sur l'intelligence artificielle multi-agents (LangGraph + Groq).
 
 ---
 
-## 📋 Table des matières
+## Table des matieres
 
-- [Aperçu du projet](#aperçu-du-projet)
-- [Fonctionnalités](#fonctionnalités)
+- [Apercu du projet](#apercu-du-projet)
+- [Fonctionnalites](#fonctionnalites)
 - [Architecture technique](#architecture-technique)
 - [Pipeline multi-agents](#pipeline-multi-agents)
-- [Prérequis](#prérequis)
+- [Prerequis](#prerequis)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Lancement](#lancement)
 - [Utilisation](#utilisation)
 - [Structure du projet](#structure-du-projet)
 - [API Reference](#api-reference)
-- [Normes supportées](#normes-supportées)
+- [Normes supportees](#normes-supportees)
 - [Exemple de protocole test](#exemple-de-protocole-test)
-- [Résultats attendus](#résultats-attendus)
-- [Technologies utilisées](#technologies-utilisées)
+- [Resultats attendus](#resultats-attendus)
+- [Technologies utilisees](#technologies-utilisees)
 - [Auteur](#auteur)
 
 ---
 
-## 📌 Aperçu du projet
+## Apercu du projet
 
-**AI Protocol Validator** est une application web full-stack qui permet de valider automatiquement des protocoles de fabrication (cosmétique, pharmaceutique, agroalimentaire) contre des normes industrielles telles que **ISO 22716**.
+AI Protocol Validator est une application web full-stack qui permet de valider automatiquement des protocoles de fabrication (cosmetique, pharmaceutique, agroalimentaire) contre des normes industrielles telles que ISO 22716.
 
-L'utilisateur charge un fichier PDF contenant son protocole, sélectionne la norme applicable, et le système orchestre un pipeline de 6 agents IA spécialisés qui analysent, vérifient, évaluent le risque, et génèrent un rapport de conformité complet.
-
----
-
-## ✨ Fonctionnalités
-
-- 📄 **Import PDF** — Glisser-déposer ou sélection de fichier PDF
-- 🤖 **Analyse multi-agents** — Pipeline LangGraph avec 6 agents IA spécialisés
-- 📏 **Vérification ISO** — Contrôle automatique contre les règles ISO 22716
-- 📊 **Score de risque** — Évaluation sur 10 avec justification
-- ✅ **Décision automatique** — ACCEPTÉ ou REJETÉ selon le score
-- 📑 **Rapport PDF** — Généré automatiquement en cas de non-conformité
-- 🔄 **Optimisation automatique** — Le protocole est corrigé si des écarts sont détectés
-- 🎯 **Interface intuitive** — Barre de progression animée par étape d'agent
+L'utilisateur charge un fichier PDF contenant son protocole, selectionne la norme applicable, et le systeme orchestre un pipeline de 6 agents IA specialises qui analysent, verifient, evaluent le risque, et generent un rapport de conformite complet.
 
 ---
 
-## 🏗️ Architecture technique
+## Fonctionnalites
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   FRONTEND (HTML/CSS/JS)             │
-│  - Upload PDF        - Barre de progression          │
-│  - Extraction texte  - Affichage résultats           │
-│    (pdf.js)          - Téléchargement rapport PDF    │
-└────────────────────────┬────────────────────────────┘
-                         │ HTTP POST /api/analyze
-                         ▼
-┌─────────────────────────────────────────────────────┐
-│                  BACKEND (Flask + Python)            │
-│                                                     │
-│  ┌─────────────────────────────────────────────┐   │
-│  │           LangGraph — Pipeline agents        │   │
-│  │                                             │   │
-│  │  [Analyzer] → [ISO Expert] → [Validator]    │   │
-│  │       ↓                          ↓          │   │
-│  │  [Risk Assessor] → [Optimizer] → [Scribe]   │   │
-│  └─────────────────────────────────────────────┘   │
-│                         │                           │
-│               LLM : Groq (Llama 3.1 8B)            │
-│               PDF : ReportLab                       │
-└─────────────────────────────────────────────────────┘
-```
+- Import PDF par glisser-deposer ou selection de fichier
+- Analyse multi-agents via pipeline LangGraph avec 6 agents IA specialises
+- Verification automatique contre les regles ISO 22716
+- Score de risque sur 10 avec justification
+- Decision automatique ACCEPTE ou REJETE selon le score
+- Generation de rapport PDF uniquement en cas de non-conformite
+- Optimisation automatique du protocole si des ecarts sont detectes
+- Interface avec barre de progression animee par etape d'agent
 
 ---
 
-## 🤖 Pipeline multi-agents
-
-Le coeur du système est un graphe d'agents orchestré par **LangGraph**. Chaque agent a un rôle précis :
-
-| # | Agent | Rôle | Technologie |
-|---|-------|------|-------------|
-| 1 | **Analyzer** | Extrait les données clés du protocole (température, pH, durée, EPI...) en JSON structuré | Groq LLM |
-| 2 | **ISO Expert** | Injecte les règles ISO 22716 statiques dans le pipeline | Règles statiques |
-| 3 | **Validator** | Compare les données extraites aux règles ISO et liste les violations | Groq LLM |
-| 4 | **Risk Assessor** | Calcule un score de risque de 0 à 10 avec justification | Groq LLM |
-| 5 | **Optimizer** | Si score ≥ 3, réécrit les étapes problématiques du protocole | Groq LLM |
-| 6 | **Scribe** | Génère le rapport d'audit final structuré en 4 sections | Groq LLM |
-
-### Logique de décision
+## Architecture technique
 
 ```
-Score < 3  → ACCEPTÉ  → Rapport automatique sans LLM (Scribe Direct)
-Score ≥ 3  → REJETÉ   → Optimisation → Nouveau cycle → Rapport complet PDF
++-----------------------------------------------------+
+|               FRONTEND (HTML / CSS / JS)            |
+|  - Upload PDF          - Barre de progression       |
+|  - Extraction texte    - Affichage des resultats    |
+|    via pdf.js          - Telechargement rapport PDF |
++------------------------+----------------------------+
+                         |
+                         | HTTP POST /api/analyze
+                         |
+                         v
++-----------------------------------------------------+
+|               BACKEND (Flask + Python)              |
+|                                                     |
+|  +-----------------------------------------------+ |
+|  |         LangGraph -- Pipeline agents           | |
+|  |                                               | |
+|  |  [Analyzer] -> [ISO Expert] -> [Validator]    | |
+|  |       |                            |          | |
+|  |  [Risk Assessor] -> [Optimizer] -> [Scribe]   | |
+|  +-----------------------------------------------+ |
+|                         |                          |
+|              LLM : Groq (Llama 3.1 8B)            |
+|              PDF : ReportLab                       |
++-----------------------------------------------------+
 ```
 
 ---
 
-## ✅ Prérequis
+## Pipeline multi-agents
 
-Avant de commencer, assurez-vous d'avoir installé :
+Le coeur du systeme est un graphe d'agents orchestre par LangGraph. Chaque agent a un role precis :
 
-- **Python** 3.10 ou supérieur
-- **pip** (gestionnaire de paquets Python)
-- **Node.js** (optionnel, uniquement si vous souhaitez modifier le frontend)
-- Un compte **Groq** avec une clé API valide → [https://console.groq.com](https://console.groq.com)
+| Numero | Agent | Role | Technologie |
+|--------|-------|------|-------------|
+| 1 | Analyzer | Extrait les donnees cles du protocole (temperature, pH, duree, EPI) en JSON structure | Groq LLM |
+| 2 | ISO Expert | Injecte les regles ISO 22716 statiques dans le pipeline | Regles statiques |
+| 3 | Validator | Compare les donnees extraites aux regles ISO et liste les violations | Groq LLM |
+| 4 | Risk Assessor | Calcule un score de risque de 0 a 10 avec justification | Groq LLM |
+| 5 | Optimizer | Si score superieur ou egal a 3, recrit les etapes problematiques du protocole | Groq LLM |
+| 6 | Scribe | Genere le rapport d'audit final structure en 4 sections | Groq LLM |
+
+### Logique de decision
+
+```
+Score < 3   -->  ACCEPTE  -->  Message de conformite, pas de PDF genere
+Score >= 3  -->  REJETE   -->  Optimisation --> Nouveau cycle --> Rapport PDF complet
+```
+
+---
+
+## Prerequis
+
+Avant de commencer, assurez-vous d'avoir installe :
+
+- Python 3.10 ou superieur
+- pip (gestionnaire de paquets Python)
+- Node.js (optionnel, uniquement si vous souhaitez modifier le frontend)
+- Un compte Groq avec une cle API valide : https://console.groq.com
 - Un navigateur moderne (Chrome, Firefox, Edge)
 
 ---
 
-## 🚀 Installation
+## Installation
 
-### 1. Cloner le dépôt
+### 1. Cloner le depot
 
 ```bash
 git clone https://github.com/votre-username/ai-protocol-validator.git
 cd ai-protocol-validator
 ```
 
-### 2. Créer un environnement virtuel Python
+### 2. Creer un environnement virtuel Python
 
 ```bash
 python -m venv venv
@@ -126,17 +128,17 @@ python -m venv venv
 # Windows
 venv\Scripts\activate
 
-# macOS / Linux
+# macOS et Linux
 source venv/bin/activate
 ```
 
-### 3. Installer les dépendances Python
+### 3. Installer les dependances Python
 
 ```bash
 pip install -r requirements.txt
 ```
 
-**Contenu de `requirements.txt` :**
+Contenu du fichier `requirements.txt` :
 
 ```
 flask
@@ -149,25 +151,25 @@ reportlab
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-### Créer le fichier `.env`
+### Creer le fichier .env
 
-À la racine du projet, créez un fichier `.env` :
+A la racine du projet, creez un fichier `.env` :
 
 ```bash
 touch .env
 ```
 
-Ajoutez votre clé API Groq :
+Ajoutez votre cle API Groq :
 
-```env
+```
 GROQ_API_KEY=votre_cle_api_groq_ici
 ```
 
-> ⚠️ **Important** : Ne partagez jamais votre clé API. Ajoutez `.env` à votre `.gitignore`.
+Important : ne partagez jamais votre cle API. Ajoutez `.env` a votre `.gitignore`.
 
-### Fichier `.gitignore` recommandé
+### Fichier .gitignore recommande
 
 ```
 .env
@@ -179,20 +181,18 @@ __pycache__/
 
 ---
 
-## ▶️ Lancement
+## Lancement
 
-### Démarrer le serveur backend Flask
+### Demarrer le serveur backend Flask
 
 ```bash
 python app.py
 ```
 
-Le serveur démarre sur `http://localhost:5000`.
-
-Vous devriez voir :
+Le serveur demarre sur `http://localhost:5000`. Vous devriez voir dans le terminal :
 
 ```
-🚀 Serveur Flask démarré sur http://localhost:5000
+Serveur Flask demarre sur http://localhost:5000
 ```
 
 ### Ouvrir le frontend
@@ -203,103 +203,101 @@ Ouvrez le fichier `index.html` directement dans votre navigateur, ou utilisez un
 # Option 1 : Python
 python -m http.server 3000
 
-# Option 2 : Node.js (live-server)
+# Option 2 : Node.js avec live-server
 npx live-server --port=3000
 ```
 
-Accédez à : `http://localhost:3000`
+Puis accedez a : `http://localhost:3000`
 
 ---
 
-## 🖥️ Utilisation
+## Utilisation
 
-### Étape 1 — Charger un protocole PDF
+### Etape 1 — Charger un protocole PDF
 
-Glissez-déposez votre fichier PDF dans la zone prévue, ou cliquez sur **"Parcourir les fichiers"** pour sélectionner votre fichier.
+Glissez-deposez votre fichier PDF dans la zone prevue, ou cliquez sur "Parcourir les fichiers" pour selectionner votre fichier. Le fichier doit etre un PDF avec du texte extractible (non scanne).
 
-> Le fichier doit être un PDF avec du texte extractible (non scanné).
+### Etape 2 — Saisir la norme industrielle
 
-### Étape 2 — Saisir la norme industrielle
-
-Dans le champ **"Norme Industrielle"**, saisissez la norme applicable, par exemple :
+Dans le champ "Norme Industrielle", saisissez la norme applicable. Exemple :
 
 ```
 ISO 22716
 ```
 
-### Étape 3 — Lancer l'analyse
+### Etape 3 — Lancer l'analyse
 
-Cliquez sur **"Analyser le protocole"**. La barre de progression affiche l'avancement en temps réel à travers les 5 étapes agents.
+Cliquez sur "Analyser le protocole". La barre de progression affiche l'avancement en temps reel a travers les 5 etapes agents.
 
-### Étape 4 — Consulter les résultats
+### Etape 4 — Consulter les resultats
 
-Une fois l'analyse terminée :
+Une fois l'analyse terminee :
 
-- **Score de risque** — Affiché sur 10 avec code couleur (vert / orange / rouge)
-- **Décision** — ACCEPTÉ ou REJETÉ
-- Si **ACCEPTÉ** → Message de conformité affiché, aucun PDF généré
-- Si **REJETÉ** → Bouton de téléchargement du rapport PDF disponible
-- **Analyse du protocole** — Étapes, ingrédients, normes appliquées
-- **Validation** — Liste des erreurs détectées ou confirmation de conformité
+- Le score de risque est affiche sur 10 avec code couleur (vert, orange, rouge)
+- La decision ACCEPTE ou REJETE est affichee
+- Si ACCEPTE : un message de conformite s'affiche, aucun PDF n'est genere
+- Si REJETE : le bouton de telechargement du rapport PDF apparait
+- Le detail de l'analyse affiche les etapes, ingredients et normes appliquees
+- La section Validation liste les erreurs detectees ou confirme la conformite
 
 ---
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 ai-protocol-validator/
-│
-├── app.py                  # Backend Flask + Pipeline LangGraph
-├── index.html              # Interface utilisateur principale
-├── script.js               # Logique frontend (upload, API, résultats)
-├── styles.css              # Styles CSS de l'interface
-├── requirements.txt        # Dépendances Python
-├── .env                    # Clé API Groq (non versionné)
-├── .gitignore              # Fichiers à exclure du dépôt
-└── README.md               # Documentation du projet
+|
++-- app.py                  Backend Flask et pipeline LangGraph
++-- index.html              Interface utilisateur principale
++-- script.js               Logique frontend (upload, API, resultats)
++-- styles.css              Styles CSS de l'interface
++-- requirements.txt        Dependances Python
++-- .env                    Cle API Groq (non versionnee)
++-- .gitignore              Fichiers a exclure du depot
++-- README.md               Documentation du projet
 ```
 
 ---
 
-## 📡 API Reference
+## API Reference
 
-### `POST /api/analyze`
+### POST /api/analyze
 
-Analyse un protocole et retourne les résultats complets.
+Analyse un protocole et retourne les resultats complets.
 
-**Request** — `multipart/form-data`
+**Requete** — multipart/form-data
 
 | Champ | Type | Requis | Description |
 |-------|------|--------|-------------|
-| `protocol` | `string` | ✅ | Texte extrait du PDF |
-| `norme` | `string` | ✅ | Norme industrielle (ex: ISO 22716) |
+| protocol | string | Oui | Texte extrait du PDF |
+| norme | string | Oui | Norme industrielle (ex : ISO 22716) |
 
-**Response** — `application/json`
+**Reponse** — application/json
 
 ```json
 {
   "analysis": {
-    "etapes": ["Étape 1 : ...", "Étape 2 : ..."],
+    "etapes": ["Etape 1 : ...", "Etape 2 : ..."],
     "ingredients": ["Composant A", "Composant B"],
-    "normes": ["Température max : 75°C", "pH : 4.5–7.5", "..."]
+    "normes": ["Temperature max : 75 C", "pH : 4.5 a 7.5"]
   },
   "risk_score": 2,
-  "decision": "ACCEPTÉ",
+  "decision": "ACCEPTE",
   "validation": {
     "erreurs": []
   },
   "pdf_url": "data:application/pdf;base64,...",
-  "final_report": "RÉSUMÉ EXÉCUTIF\n..."
+  "final_report": "RESUME EXECUTIF\n..."
 }
 ```
 
 ---
 
-### `GET /api/health`
+### GET /api/health
 
-Vérifie que le serveur est opérationnel.
+Verifie que le serveur est operationnel.
 
-**Response**
+**Reponse**
 
 ```json
 {
@@ -310,11 +308,11 @@ Vérifie que le serveur est opérationnel.
 
 ---
 
-### `POST /api/download-pdf`
+### POST /api/download-pdf
 
-Télécharge le PDF généré.
+Telecharge le PDF genere.
 
-**Request** — `application/json`
+**Requete** — application/json
 
 ```json
 {
@@ -322,82 +320,82 @@ Télécharge le PDF généré.
 }
 ```
 
-**Response** — Fichier PDF en téléchargement direct.
+**Reponse** : fichier PDF en telechargement direct.
 
 ---
 
-## 📏 Normes supportées
+## Normes supportees
 
-Le système est pré-configuré avec les règles **ISO 22716** (cosmétiques) :
+Le systeme est pre-configure avec les regles ISO 22716 (cosmetiques) :
 
-| Règle | Valeur |
+| Regle | Valeur |
 |-------|--------|
-| Température maximale | 75 °C |
-| pH produit fini | 4,5 à 7,5 |
-| EPI obligatoires | Gants haute température + lunettes + tablier |
-| Durée max mélange à chaud | 20 minutes |
-| Dépassement thermique | Suspension du lot obligatoire |
+| Temperature maximale | 75 degres C |
+| pH produit fini | 4,5 a 7,5 |
+| EPI obligatoires | Gants haute temperature, lunettes, tablier |
+| Duree max melange a chaud | 20 minutes |
+| Depassement thermique | Suspension du lot obligatoire |
 
-> D'autres normes peuvent être ajoutées en modifiant la liste `ISO_RULES` dans `app.py`.
+D'autres normes peuvent etre ajoutees en modifiant la liste `ISO_RULES` dans `app.py`.
 
 ---
 
-## 🧪 Exemple de protocole test
+## Exemple de protocole test
 
 Pour tester rapidement l'application, utilisez ce protocole conforme :
 
 ```
-PROTOCOLE DE FABRICATION — CRÈME HYDRATANTE
+PROTOCOLE DE FABRICATION — CREME HYDRATANTE
 Lot : LOT-2024-001 | Statut : CONFORME
 
-Étape 1 : Peser les ingrédients (eau purifiée, glycérine, cire émulsifiante, huile de jojoba)
-Étape 2 : Chauffer la phase aqueuse à 65°C
-Étape 3 : Chauffer la phase huileuse à 65°C
-Étape 4 : Mélange à chaud des deux phases pendant 15 minutes
-Étape 5 : Refroidissement progressif jusqu'à 35°C
-Étape 6 : Ajout des actifs thermosensibles
-Étape 7 : Contrôle pH = 5,5
-EPI portés : gants haute température, lunettes de protection, tablier
-Température max atteinte : 65°C | Seuil autorisé : 75°C
-Dépassement détecté : NON
+Etape 1 : Peser les ingredients (eau purifiee, glycerine, cire emulsifiante, huile de jojoba)
+Etape 2 : Chauffer la phase aqueuse a 65 degres C
+Etape 3 : Chauffer la phase huileuse a 65 degres C
+Etape 4 : Melange a chaud des deux phases pendant 15 minutes
+Etape 5 : Refroidissement progressif jusqu'a 35 degres C
+Etape 6 : Ajout des actifs thermosensibles
+Etape 7 : Controle pH = 5,5
+EPI portes : gants haute temperature, lunettes de protection, tablier
+Temperature max atteinte : 65 degres C | Seuil autorise : 75 degres C
+Depassement detecte : NON
 ```
 
 ---
 
-## 📊 Résultats attendus
+## Resultats attendus
 
-| Score | Couleur | Décision | Action |
-|-------|---------|----------|--------|
-| 0 – 2 | 🟢 Vert | ACCEPTÉ | Message de conformité, pas de PDF |
-| 3 – 6 | 🟡 Orange | REJETÉ | Optimisation + rapport PDF généré |
-| 7 – 10 | 🔴 Rouge | REJETÉ | Optimisation + rapport PDF détaillé |
+| Score | Couleur affichee | Decision | Action |
+|-------|-----------------|----------|--------|
+| 0 a 2 | Vert | ACCEPTE | Message de conformite, pas de PDF genere |
+| 3 a 6 | Orange | REJETE | Optimisation automatique et rapport PDF genere |
+| 7 a 10 | Rouge | REJETE | Optimisation automatique et rapport PDF detaille |
 
 ---
 
-## 🛠️ Technologies utilisées
+## Technologies utilisees
 
 | Technologie | Usage |
 |-------------|-------|
-| **Python 3.10+** | Backend principal |
-| **Flask** | Serveur API REST |
-| **Flask-CORS** | Gestion des requêtes cross-origin |
-| **LangGraph** | Orchestration du pipeline multi-agents |
-| **LangChain-Groq** | Interface LLM (Llama 3.1 8B Instant) |
-| **Groq API** | Inférence LLM ultra-rapide |
-| **ReportLab** | Génération de rapports PDF |
-| **pdf.js** | Extraction de texte côté frontend |
-| **HTML / CSS / JS** | Interface utilisateur |
-| **python-dotenv** | Gestion des variables d'environnement |
+| Python 3.10+ | Backend principal |
+| Flask | Serveur API REST |
+| Flask-CORS | Gestion des requetes cross-origin |
+| LangGraph | Orchestration du pipeline multi-agents |
+| LangChain-Groq | Interface avec le LLM Llama 3.1 8B |
+| Groq API | Inference LLM ultra-rapide |
+| ReportLab | Generation de rapports PDF |
+| pdf.js | Extraction de texte PDF cote frontend |
+| HTML / CSS / JS | Interface utilisateur |
+| python-dotenv | Gestion des variables d'environnement |
 
 ---
 
-## 👤 Auteur
+## Auteur
 
-Développé dans le cadre d'un projet d'intelligence artificielle appliquée à la validation de protocoles industriels.
+Developpe dans le cadre d'un projet d'intelligence artificielle appliquee a la validation de protocoles industriels.
 
-- 📧 Contact : votre.email@exemple.com
-- 🐙 GitHub : [github.com/votre-username](https://github.com/votre-username)
+- Contact : votre.email@exemple.com
+- GitHub : https://github.com/votre-username
 
 ---
 
-> 💡 **Astuce** : Pour tester rapidement sans PDF, copiez le texte du protocole exemple dans un fichier `.txt`, renommez-le en `.pdf`, et chargez-le dans l'application. Le fallback de lecture texte prendra le relais automatiquement.
+Note : Pour tester rapidement sans PDF, copiez le texte du protocole exemple dans un fichier `.txt`, renommez-le en `.pdf`, et chargez-le dans l'application. Le systeme lira le texte brut automatiquement via le fallback de lecture.
